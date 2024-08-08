@@ -4,6 +4,7 @@ import (
 	"GameBuy/configs"
 	"GameBuy/databases/connection"
 	"GameBuy/modules/category"
+	"GameBuy/modules/game"
 	"GameBuy/modules/platform"
 
 	"github.com/gin-gonic/gin"
@@ -25,6 +26,7 @@ func InitiateRouter() {
 
 	platform.Initiator(router)
 	category.Initiator(router)
+	game.Initiator(router)
 
-	router.Run(":8080")
+	router.Run(":8081")
 }

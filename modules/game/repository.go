@@ -24,7 +24,7 @@ type gameRepository struct {
 func (p *gameRepository) Update(game Game) (err error) {
 	sqlStmt := "UPDATE " + constant.GameTableName.String() + "\n" +
 		"SET title = $1, harga = $2, category_id = $3, platform_id=$4, modified_at = $5, modified_by = $6 " + "\n" +
-		"WHERE id = $4"
+		"WHERE id = $7"
 
 	params := []interface{}{
 		game.Title,
@@ -56,7 +56,7 @@ func (p *gameRepository) Update(game Game) (err error) {
 // Create implements Repository.
 func (p *gameRepository) Create(game Game) (err error) {
 	sqlStmt := "INSERT INTO " + constant.GameTableName.String() + "\n" +
-		" (name, harga, category_id, platform_id, created_at, created_by, modified_at, modified_by)" + "\n" +
+		" (title, harga, category_id, platform_id, created_at, created_by, modified_at, modified_by)" + "\n" +
 		" VALUES ($1, $2, $3, $4, $5, $6, $7, $8)"
 
 	params := []interface{}{

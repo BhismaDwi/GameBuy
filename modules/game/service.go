@@ -50,6 +50,7 @@ func (service *gameService) CreateGameService(ctx *gin.Context) (err error) {
 		return err
 	}
 
+	//Check if game already exists
 	var games []Game
 	games, err = service.repository.GetAll()
 	if err != nil {
