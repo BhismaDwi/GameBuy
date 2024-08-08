@@ -6,6 +6,7 @@ import (
 	"GameBuy/modules/game"
 	"GameBuy/modules/platform"
 	"GameBuy/modules/transaksidetail"
+	"GameBuy/modules/users"
 	"database/sql"
 	"errors"
 )
@@ -120,7 +121,7 @@ func (p *transaksiRepository) Delete(transaksi Transaksi) (err error) {
 // GetAll implements Transaksi.
 func (p *transaksiRepository) GetAll() (transaksies []Transaksi, err error) {
 	sqlStmt := "SELECT t.id, t.tgl_transaksi, t.user_id, t.total_harga, t.created_at, t.created_by, t.modified_at, t.modified_by, " +
-		" td.id, td.transaksi_id, td.game_id, g.id, g.title, g.harga, g.category_id, g.platform_id, p.name, p.id, c.name, c.id " +
+		" td.id, td.transaksi_id, td.game_id, g.id, g.title, g.harga, g.category_id, g.platform_id, p.name, p.id, c.name, c.id, u.id, u.username, u.role_id" +
 		" FROM " + constant.TransaksiTableName.String() + " AS t " +
 		" JOIN " + constant.TransaksiDetailTableName.String() + " AS td " +
 		" ON t.id = td.transaksi_id " +
@@ -129,7 +130,10 @@ func (p *transaksiRepository) GetAll() (transaksies []Transaksi, err error) {
 		" JOIN " + constant.PlatformTableName.String() + " AS p " +
 		" ON g.platform_id = p.id " +
 		" JOIN " + constant.CategoryTableName.String() + " AS c  " +
-		" ON g.platform_id = c.id"
+		" ON g.platform_id = c.id " +
+		" JOIN " + constant.UsersTableName.String() + " AS u " +
+		" ON t.user_id = u.id " +
+		" ORDER BY t.id ASC"
 
 	rows, err := p.db.Query(sqlStmt)
 
@@ -145,11 +149,12 @@ func (p *transaksiRepository) GetAll() (transaksies []Transaksi, err error) {
 		var game game.Game
 		var platform platform.Platform
 		var category category.Category
+		var user users.User
 
-		if err = rows.Scan(&transaksi.ID, &transaksi.TglTransakksi, &transaksi.UserID, &transaksi.TotalHarga, &transaksi.CreatedAt, &transaksi.CreatedBy, &transaksi.ModifiedAt, &transaksi.ModifiedBy, &transaksiDetail.ID, &transaksiDetail.TransaksiID, &transaksiDetail.GameID, &game.ID, &game.Title, &game.Harga, &game.CategoryId, &game.PlatformId, &platform.Name, &platform.ID, &category.Name, &category.ID); err != nil {
+		if err = rows.Scan(&transaksi.ID, &transaksi.TglTransakksi, &transaksi.UserID, &transaksi.TotalHarga, &transaksi.CreatedAt, &transaksi.CreatedBy, &transaksi.ModifiedAt, &transaksi.ModifiedBy, &transaksiDetail.ID, &transaksiDetail.TransaksiID, &transaksiDetail.GameID, &game.ID, &game.Title, &game.Harga, &game.CategoryId, &game.PlatformId, &platform.Name, &platform.ID, &category.Name, &category.ID, &user.ID, &user.Username, &user.RoleId); err != nil {
 			return nil, err
 		}
-
+		transaksi.User = user
 		game.Category = category
 		game.Platform = platform
 		transaksiDetail.Game = game

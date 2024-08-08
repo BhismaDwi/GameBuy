@@ -63,10 +63,10 @@ func (service *transaksiService) CreateTransaksiService(ctx *gin.Context) (err e
 			return errors.New("game does not exist")
 		}
 	}
-	// userID, exists := ctx.Get("userID")
-	// if !exists {
-	// 	return errors.New("user ID not found in context")
-	// }
+	userID, exists := ctx.Get("userID")
+	if !exists {
+		return errors.New("user ID not found in context")
+	}
 
 	defaultField := common.DefaultFieldTable{}
 	defaultField.SetDefaultField()
@@ -75,7 +75,7 @@ func (service *transaksiService) CreateTransaksiService(ctx *gin.Context) (err e
 	newTransaksi.CreatedBy = defaultField.CreatedBy
 	newTransaksi.ModifiedAt = defaultField.ModifiedAt
 	newTransaksi.ModifiedBy = defaultField.ModifiedBy
-	// newTransaksi.UserID = userID.(int)
+	newTransaksi.UserID = int(userID.(int64))
 
 	err = service.repository.Create(newTransaksi)
 	if err != nil {

@@ -36,6 +36,7 @@ func JwtMiddleware() gin.HandlerFunc {
 		}
 		fmt.Println(data)
 		c.Set("auth", data)
+		c.Set("userID", data.UserId)
 		c.Next()
 	}
 }
