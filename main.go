@@ -3,6 +3,7 @@ package main
 import (
 	"GameBuy/configs"
 	"GameBuy/databases/connection"
+	"GameBuy/databases/migration"
 	"GameBuy/modules/category"
 	"GameBuy/modules/game"
 	"GameBuy/modules/platform"
@@ -18,7 +19,7 @@ func main() {
 	connection.Initiator()
 	defer connection.DBConnections.Close()
 
-	// migration.Initiator(connection.DBConnections)
+	migration.Initiator(connection.DBConnections)
 
 	InitiateRouter()
 }
