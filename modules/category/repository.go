@@ -14,6 +14,7 @@ type Repository interface {
 	Create(category Category) (err error)
 	Update(category Category) (err error)
 	Delete(category Category) (err error)
+	CheckCategoryExists(id int) (exists bool, err error)
 }
 
 type categoryRepository struct {
@@ -167,6 +168,17 @@ func (r *categoryRepository) GetByName(name string) (category Category, err erro
 		}
 	}
 	return category, nil
+}
+
+func (p *categoryRepository) CheckCategoryExists(id int) (exists bool, err error) {
+	sqlStmt := "SELECT EXISTS(SELECT 1 FROM " + constant.CategoryTableName.String() + " WHERE id = $1)"
+
+	err = p.db.QueryRow(sqlStmt, id).Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+
+	return exists, nil
 }
 
 func NewRepository(database *sql.DB) Repository {

@@ -23,7 +23,7 @@ const (
 	RoleTableName            TableName = "role"
 	TransaksiTableName       TableName = "transaksi"
 	TransaksiDetailTableName TableName = "transaksi_detail"
-	UserDetailTableName      TableName = "users"
+	UsersTableName           TableName = "users"
 )
 
 // type DateTimeFormat string

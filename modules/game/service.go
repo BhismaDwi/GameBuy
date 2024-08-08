@@ -2,6 +2,8 @@ package game
 
 import (
 	"GameBuy/helpers/common"
+	"GameBuy/modules/category"
+	"GameBuy/modules/platform"
 	"errors"
 	"strconv"
 
@@ -18,11 +20,19 @@ type Service interface {
 }
 
 type gameService struct {
-	repository Repository
+	repository         Repository
+	platformRepository platform.Repository
+	categoryRepository category.Repository
+}
+
+func NewServiceWithPlatCat(repository Repository, platformRepo platform.Repository, categoryRepo category.Repository) Service {
+	return &gameService{repository: repository,
+		platformRepository: platformRepo,
+		categoryRepository: categoryRepo}
 }
 
 func NewService(repository Repository) Service {
-	return &gameService{repository}
+	return &gameService{repository: repository}
 }
 
 func (service *gameService) GetAllGameService(ctx *gin.Context) (game []Game, err error) {
@@ -65,6 +75,24 @@ func (service *gameService) CreateGameService(ctx *gin.Context) (err error) {
 	if len(games) != 0 && game.Title != "" {
 		err = errors.New("game already exists")
 		return err
+	}
+
+	// Check if platform exists
+	platformExists, err := service.platformRepository.CheckPlatformExists(newGame.PlatformId)
+	if err != nil {
+		return err
+	}
+	if !platformExists {
+		return errors.New("platform does not exist")
+	}
+
+	// Check if category exists
+	categoryExists, err := service.categoryRepository.CheckCategoryExists(newGame.CategoryId)
+	if err != nil {
+		return err
+	}
+	if !categoryExists {
+		return errors.New("category does not exist")
 	}
 
 	defaultField := common.DefaultFieldTable{}

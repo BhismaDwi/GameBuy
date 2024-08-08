@@ -2,6 +2,8 @@ package game
 
 import (
 	"GameBuy/helpers/constant"
+	"GameBuy/modules/category"
+	"GameBuy/modules/platform"
 	"database/sql"
 	"errors"
 )
@@ -14,10 +16,22 @@ type Repository interface {
 	Create(game Game) (err error)
 	Update(game Game) (err error)
 	Delete(game Game) (err error)
+	CheckGameExists(id int) (exists bool, err error)
 }
 
 type gameRepository struct {
 	db *sql.DB
+}
+
+func (p *gameRepository) CheckGameExists(id int) (exists bool, err error) {
+	sqlStmt := "SELECT EXISTS(SELECT 1 FROM " + constant.GameTableName.String() + " WHERE id = $1)"
+
+	err = p.db.QueryRow(sqlStmt, id).Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+
+	return exists, nil
 }
 
 // Update implements Repository.
@@ -106,8 +120,13 @@ func (p *gameRepository) Delete(game Game) (err error) {
 
 // GetAll implements Game.
 func (p *gameRepository) GetAll() (games []Game, err error) {
-	sqlStmt := "SELECT id, title, harga, category_id, platform_id, created_at, created_by, modified_at, modified_by " + "\n" +
-		"FROM " + constant.GameTableName.String()
+	sqlStmt := "SELECT game.id, game.title, game.harga, game.category_id, game.platform_id, game.created_at, game.created_by, " +
+		" game.modified_at, game.modified_by, platform.name, platform.id, category.name, category.id " +
+		" FROM " + constant.GameTableName.String() + " AS game " +
+		" JOIN " + constant.PlatformTableName.String() + " AS platform " +
+		" ON " + constant.GameTableName.String() + ".platform_id = " + constant.PlatformTableName.String() + ".id " +
+		" JOIN " + constant.CategoryTableName.String() + " AS category  " +
+		" ON " + constant.GameTableName.String() + ".platform_id = " + constant.CategoryTableName.String() + ".id"
 
 	rows, err := p.db.Query(sqlStmt)
 
@@ -119,10 +138,14 @@ func (p *gameRepository) GetAll() (games []Game, err error) {
 
 	for rows.Next() {
 		var game Game
+		var platform platform.Platform
+		var category category.Category
 		if err = rows.Scan(&game.ID, &game.Title, &game.Harga, &game.CategoryId, &game.PlatformId, &game.CreatedAt, &game.CreatedBy,
-			&game.ModifiedAt, &game.ModifiedBy); err != nil {
+			&game.ModifiedAt, &game.ModifiedBy, &platform.Name, &platform.ID, &category.Name, &category.ID); err != nil {
 			return nil, err
 		}
+		game.Platform = platform
+		game.Category = category
 		games = append(games, game)
 	}
 

@@ -3,14 +3,15 @@ package platform
 import (
 	"GameBuy/databases/connection"
 	"GameBuy/helpers/common"
+	"GameBuy/middlewares"
 
 	"github.com/gin-gonic/gin"
 )
 
 func Initiator(router *gin.Engine) {
 	api := router.Group("/api")
-	// api.Use(middlewares.JwtMiddleware())
-	// api.Use(middlewares.Logging())
+	api.Use(middlewares.JwtMiddleware())
+	api.Use(middlewares.Logging())
 	{
 		api.GET("/platforms", GetAllPlatformRouter)
 		api.GET("/platforms/:id", GetPlatformByIdRouter)

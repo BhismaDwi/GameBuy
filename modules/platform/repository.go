@@ -14,6 +14,7 @@ type Repository interface {
 	Create(platform Platform) (err error)
 	Update(platform Platform) (err error)
 	Delete(platform Platform) (err error)
+	CheckPlatformExists(id int) (exists bool, err error)
 }
 
 type platformRepository struct {
@@ -167,6 +168,17 @@ func (r *platformRepository) GetByName(name string) (platform Platform, err erro
 		}
 	}
 	return platform, nil
+}
+
+func (p *platformRepository) CheckPlatformExists(id int) (exists bool, err error) {
+	sqlStmt := "SELECT EXISTS(SELECT 1 FROM " + constant.PlatformTableName.String() + " WHERE id = $1)"
+
+	err = p.db.QueryRow(sqlStmt, id).Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+
+	return exists, nil
 }
 
 func NewRepository(database *sql.DB) Repository {

@@ -28,8 +28,7 @@ CREATE TABLE role (
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
   username VARCHAR(256) NOT NULL,
-  email VARCHAR(255) NULL,
-  password VARCHAR(32) NOT NULL,
+  password VARCHAR(256) NOT NULL,
   role_id INT NOT NULL,
   created_at TIMESTAMP(0) NULL,
   created_by VARCHAR(100) NULL,

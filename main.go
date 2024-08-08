@@ -6,6 +6,8 @@ import (
 	"GameBuy/modules/category"
 	"GameBuy/modules/game"
 	"GameBuy/modules/platform"
+	"GameBuy/modules/transaksi"
+	"GameBuy/modules/users"
 
 	"github.com/gin-gonic/gin"
 )
@@ -27,6 +29,8 @@ func InitiateRouter() {
 	platform.Initiator(router)
 	category.Initiator(router)
 	game.Initiator(router)
+	transaksi.Initiator(router)
+	users.Initiator(router)
 
-	router.Run(":8081")
+	router.Run(":8080")
 }

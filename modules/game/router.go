@@ -3,14 +3,17 @@ package game
 import (
 	"GameBuy/databases/connection"
 	"GameBuy/helpers/common"
+	"GameBuy/middlewares"
+	"GameBuy/modules/category"
+	"GameBuy/modules/platform"
 
 	"github.com/gin-gonic/gin"
 )
 
 func Initiator(router *gin.Engine) {
 	api := router.Group("/api")
-	// api.Use(middlewares.JwtMiddleware())
-	// api.Use(middlewares.Logging())
+	api.Use(middlewares.JwtMiddleware())
+	api.Use(middlewares.Logging())
 	{
 		api.GET("/games", GetAllGameRouter)
 		api.GET("/games/:id", GetGameByIdRouter)
@@ -67,8 +70,10 @@ func GetGameByIdRouter(ctx *gin.Context) {
 
 func CreateGameRouter(ctx *gin.Context) {
 	var (
-		gameRepo = NewRepository(connection.DBConnections)
-		gameSrv  = NewService(gameRepo)
+		gameRepo     = NewRepository(connection.DBConnections)
+		platformRepo = platform.NewRepository(connection.DBConnections)
+		categoryRepo = category.NewRepository(connection.DBConnections)
+		gameSrv      = NewServiceWithPlatCat(gameRepo, platformRepo, categoryRepo)
 	)
 
 	err := gameSrv.CreateGameService(ctx)
