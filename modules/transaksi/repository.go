@@ -167,9 +167,25 @@ func (p *transaksiRepository) GetAll() (transaksies []Transaksi, err error) {
 
 // GetByID implements Repository.
 func (p *transaksiRepository) GetByID(id int) (transaksi Transaksi, err error) {
-	sqlStmt := "SELECT id, tgl_transaksi, user_id, total_harga, created_at, created_by, modified_at, modified_by " + "\n" +
-		"FROM " + constant.TransaksiTableName.String() + "\n" +
-		"WHERE id = $1"
+	// sqlStmt := "SELECT id, tgl_transaksi, user_id, total_harga, created_at, created_by, modified_at, modified_by " + "\n" +
+	// 	"FROM " + constant.TransaksiTableName.String() + "\n" +
+	// 	"WHERE id = $1"
+
+	sqlStmt := "SELECT t.id, t.tgl_transaksi, t.user_id, t.total_harga, t.created_at, t.created_by, t.modified_at, t.modified_by, " +
+		" td.id, td.transaksi_id, td.game_id, g.id, g.title, g.harga, g.category_id, g.platform_id, p.name, p.id, c.name, c.id, u.id, u.username, u.role_id" +
+		" FROM " + constant.TransaksiTableName.String() + " AS t " +
+		" JOIN " + constant.TransaksiDetailTableName.String() + " AS td " +
+		" ON t.id = td.transaksi_id " +
+		" JOIN " + constant.GameTableName.String() +
+		" AS g ON g.id = td.game_id " +
+		" JOIN " + constant.PlatformTableName.String() + " AS p " +
+		" ON g.platform_id = p.id " +
+		" JOIN " + constant.CategoryTableName.String() + " AS c  " +
+		" ON g.platform_id = c.id " +
+		" JOIN " + constant.UsersTableName.String() + " AS u " +
+		" ON t.user_id = u.id " +
+		" WHERE t.id = $1" +
+		" ORDER BY t.id ASC"
 
 	params := []interface{}{id}
 
@@ -180,10 +196,21 @@ func (p *transaksiRepository) GetByID(id int) (transaksi Transaksi, err error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		if err = rows.Scan(&transaksi.ID, &transaksi.TglTransakksi, &transaksi.UserID, &transaksi.TotalHarga, &transaksi.CreatedAt, &transaksi.CreatedBy,
-			&transaksi.ModifiedAt, &transaksi.ModifiedBy); err != nil {
+		var transaksiDetail transaksidetail.TransaksiDetail
+		var game game.Game
+		var platform platform.Platform
+		var category category.Category
+		var user users.User
+
+		if err = rows.Scan(&transaksi.ID, &transaksi.TglTransakksi, &transaksi.UserID, &transaksi.TotalHarga, &transaksi.CreatedAt, &transaksi.CreatedBy, &transaksi.ModifiedAt, &transaksi.ModifiedBy, &transaksiDetail.ID, &transaksiDetail.TransaksiID, &transaksiDetail.GameID, &game.ID, &game.Title, &game.Harga, &game.CategoryId, &game.PlatformId, &platform.Name, &platform.ID, &category.Name, &category.ID, &user.ID, &user.Username, &user.RoleId); err != nil {
 			return transaksi, err
 		}
+
+		transaksi.User = user
+		game.Category = category
+		game.Platform = platform
+		transaksiDetail.Game = game
+		transaksi.Details = append(transaksi.Details, transaksiDetail)
 	}
 
 	return transaksi, nil
