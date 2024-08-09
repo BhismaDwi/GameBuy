@@ -126,7 +126,7 @@ func (p *gameRepository) GetAll() (games []Game, err error) {
 		" JOIN " + constant.PlatformTableName.String() + " AS platform " +
 		" ON " + constant.GameTableName.String() + ".platform_id = " + constant.PlatformTableName.String() + ".id " +
 		" JOIN " + constant.CategoryTableName.String() + " AS category  " +
-		" ON " + constant.GameTableName.String() + ".platform_id = " + constant.CategoryTableName.String() + ".id"
+		" ON " + constant.GameTableName.String() + ".category_id = " + constant.CategoryTableName.String() + ".id"
 
 	rows, err := p.db.Query(sqlStmt)
 
