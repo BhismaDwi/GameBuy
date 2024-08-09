@@ -3,12 +3,12 @@ package middlewares
 import (
 	"GameBuy/helpers/common"
 	"errors"
-	"fmt"
 	"strings"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -34,9 +34,16 @@ func JwtMiddleware() gin.HandlerFunc {
 			common.GenerateErrorResponse(c, "token expired, please log in again")
 			return
 		}
-		fmt.Println(data)
+
+		log := logrus.New()
+
+		log.WithFields(logrus.Fields{
+			"data": data,
+		}).Debug("User login information")
+
 		c.Set("auth", data)
 		c.Set("userID", data.UserId)
+		c.Set("userRole", data.Role)
 		c.Next()
 	}
 }

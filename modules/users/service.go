@@ -61,6 +61,7 @@ func (service *userService) LoginService(ctx *gin.Context) (result LoginResponse
 	middlewares.DummyRedis[jwtToken] = middlewares.UserLoginRedis{
 		UserId:    int64(user.ID),
 		Username:  user.Username,
+		Role:      user.Role.Name,
 		LoginAt:   time.Now(),
 		ExpiredAt: time.Now().Add(time.Hour * 1),
 	}

@@ -8,11 +8,11 @@ VALUES('PS 4', '2024-08-08 04:49:04.246', 'Bhismas-MBP.lan', '2024-08-08 04:49:0
 
 INSERT INTO public.role
 (name)
-VALUES('Admin');
+VALUES('admin');
 
 INSERT INTO public.role
 (name)
-VALUES('Buyer');
+VALUES('buyer');
 
 INSERT INTO public.category
 (name, created_at, created_by, modified_at, modified_by)

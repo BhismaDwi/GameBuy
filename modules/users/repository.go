@@ -2,6 +2,7 @@ package users
 
 import (
 	"GameBuy/helpers/constant"
+	"GameBuy/modules/role"
 	"database/sql"
 )
 
@@ -24,16 +25,23 @@ func NewRepository(database *sql.DB) Repository {
 }
 
 func (r *userRepository) Login(user LoginRequest) (result User, err error) {
-	sqlStmt := "SELECT id, password FROM " + constant.UsersTableName.String() + " WHERE username = $1"
+	sqlStmt := "SELECT u.id, u.password, u.username, u.role_id, r.id, r.name FROM " + constant.UsersTableName.String() + " AS u " +
+		" JOIN " + constant.RoleTableName.String() + " AS r " +
+		" ON u.role_id = r.id" +
+		" WHERE username = $1"
 
 	params := []interface{}{
 		user.Username,
 	}
 
-	err = r.db.QueryRow(sqlStmt, params...).Scan(&result.ID, &result.Password)
+	var role role.Role
+
+	err = r.db.QueryRow(sqlStmt, params...).Scan(&result.ID, &result.Password, &result.Username, &result.RoleId, &role.ID, &role.Name)
 	if err != nil && err != sql.ErrNoRows {
 		return result, err
 	}
+
+	result.Role = role
 
 	return result, nil
 }

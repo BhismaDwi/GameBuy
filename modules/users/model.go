@@ -2,6 +2,7 @@ package users
 
 import (
 	"GameBuy/helpers/common"
+	"GameBuy/modules/role"
 	"errors"
 	"regexp"
 	"time"
@@ -12,6 +13,7 @@ type User struct {
 	Username   string    `json:"username"`
 	Password   string    `json:"password"`
 	RoleId     string    `json:"role_id"`
+	Role       role.Role `json:"role"`
 	CreatedAt  time.Time `json:"created_at"`
 	CreatedBy  string    `json:"created_by"`
 	ModifiedAt time.Time `json:"modified_at"`

@@ -13,6 +13,7 @@ func Initiator(router *gin.Engine) {
 	api := router.Group("/api")
 	api.Use(middlewares.JwtMiddleware())
 	api.Use(middlewares.Logging())
+	api.Use(middlewares.RoleCheck([]string{"admin", "buyer"}))
 	{
 		api.GET("/transaksi", GetAllTransaksiRouter)
 		api.GET("/transaksi/:id", GetTransaksiByIdRouter)
