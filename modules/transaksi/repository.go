@@ -133,7 +133,7 @@ func (p *transaksiRepository) GetAll() (transaksies []Transaksi, err error) {
 		" ON g.platform_id = c.id " +
 		" JOIN " + constant.UsersTableName.String() + " AS u " +
 		" ON t.user_id = u.id " +
-		" ORDER BY t.id ASC"
+		" ORDER BY t.id ASC, td.id ASC"
 
 	rows, err := p.db.Query(sqlStmt)
 
@@ -142,7 +142,7 @@ func (p *transaksiRepository) GetAll() (transaksies []Transaksi, err error) {
 	}
 
 	defer rows.Close()
-
+	id := 0
 	for rows.Next() {
 		var transaksi Transaksi
 		var transaksiDetail transaksidetail.TransaksiDetail
@@ -159,7 +159,12 @@ func (p *transaksiRepository) GetAll() (transaksies []Transaksi, err error) {
 		game.Platform = platform
 		transaksiDetail.Game = game
 		transaksi.Details = append(transaksi.Details, transaksiDetail)
-		transaksies = append(transaksies, transaksi)
+		if id == 0 || id != transaksi.ID {
+			id = transaksi.ID
+			transaksies = append(transaksies, transaksi)
+		} else {
+			transaksies[len(transaksies)-1].Details = append(transaksies[len(transaksies)-1].Details, transaksiDetail)
+		}
 	}
 
 	return transaksies, nil
